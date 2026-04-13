@@ -9,7 +9,7 @@ import { z } from "zod";
 
 import { buildEnvelope, serializeEnvelope } from "../response.js";
 import {
-  STATION_FORECAST_SLUGS,
+  FORECAST_REGIONS,
   getStationForecast,
   type StationForecast,
 } from "../sources/forecast.js";
@@ -39,7 +39,7 @@ const inputSchema = z
 export const getWeatherForecastTool: ToolDescriptor<typeof inputSchema> = {
   name: "get_weather_forecast",
   description:
-    "Get multi-day weather forecasts for locations in Iceland. Returns 3-hourly predictions for temperature, wind, precipitation, and conditions per station. Forecast data is scraped from the Icelandic Meteorological Office public site; if scraping fails for a station, the response falls back to the national text forecast and is marked 'degraded'. Only a curated set of major stations has structured forecasts — use list_weather_stations to pick one.",
+    "Get multi-day hourly weather forecasts for locations in Iceland. Returns hour-by-hour predictions for temperature, wind, precipitation, cloud cover, and dew point. Forecasts are regional (covering one of 10 IMO forecast regions) and scraped from vedur.is; if scraping fails the response falls back to the national text forecast and is marked 'degraded'.",
   inputSchema: {
     type: "object",
     properties: {
@@ -106,10 +106,14 @@ export const getWeatherForecastTool: ToolDescriptor<typeof inputSchema> = {
       }
     }
 
+    const primarySource =
+      perStation[0]?.source_url ??
+      textFallback?.source_url ??
+      "https://www.vedur.is/vedur/spar/stadaspar/";
     const env = buildEnvelope({
-      source: textFallback?.source_url ?? "https://www.vedur.is/vedur/spar/textaspar/",
+      source: primarySource,
       data: {
-        supported_stations: Object.keys(STATION_FORECAST_SLUGS),
+        supported_regions: FORECAST_REGIONS,
         stations: perStation,
         fallback_stations: fallbackStations,
         text_fallback: textFallback,
