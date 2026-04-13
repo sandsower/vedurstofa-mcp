@@ -26,8 +26,15 @@ const inputSchema = z
       .min(1)
       .max(10)
       .optional()
+      .describe("Station IDs or names. Defaults to ['Reykjavík']."),
+    hours: z
+      .number()
+      .int()
+      .min(1)
+      .max(240)
+      .default(72)
       .describe(
-        "Station IDs or names. Only major stations have scrapeable forecasts — see 'supported stations' in tool output. Defaults to ['Reykjavík'].",
+        "How many hours of forecast to return, starting from now. Defaults to 72 (3 days). Max 240. Drop this lower when users ask about a specific near-term time.",
       ),
     lang: z
       .enum(["en", "is"])
@@ -50,6 +57,13 @@ export const getWeatherForecastTool: ToolDescriptor<typeof inputSchema> = {
         maxItems: 10,
         description: "Station IDs or names. Defaults to ['Reykjavík'].",
       },
+      hours: {
+        type: "integer",
+        minimum: 1,
+        maximum: 240,
+        description:
+          "How many hours of forecast to return, starting from now. Defaults to 72 (3 days). Max 240 (10 days). Keep this tight when the user asks about a specific near-term time.",
+      },
       lang: {
         type: "string",
         enum: ["en", "is"],
@@ -68,11 +82,17 @@ export const getWeatherForecastTool: ToolDescriptor<typeof inputSchema> = {
 
     const perStation: StationForecast[] = [];
     const fallbackStations: Array<{ station_id: string; station_name: string; reason: string }> = [];
+    const horizonMs = input.hours * 60 * 60 * 1000;
+    const cutoff = new Date(Date.now() + horizonMs);
 
     for (const { station } of resolved) {
       try {
         const fc = await getStationForecast(station.id);
-        perStation.push(fc);
+        const trimmed = fc.forecast.filter((e) => {
+          const ts = Date.parse(e.forecast_time);
+          return Number.isFinite(ts) && ts <= cutoff.getTime();
+        });
+        perStation.push({ ...fc, forecast: trimmed });
       } catch (err) {
         const reason =
           err instanceof ScraperDriftError || err instanceof UpstreamError
