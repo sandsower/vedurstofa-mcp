@@ -1,0 +1,49 @@
+{
+  "name": "vedurstofa-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for Icelandic weather, earthquakes, and hazard data from the Icelandic Meteorological Office (Veðurstofan).",
+  "keywords": [
+    "iceland",
+    "weather",
+    "earthquakes",
+    "vedurstofa",
+    "mcp",
+    "imo"
+  ],
+  "license": "MIT",
+  "author": "Vic Valenzuela",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "vedurstofa-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:smoke": "vitest run --config vitest.smoke.config.ts",
+    "prepublishOnly": "npm run typecheck && npm run test && npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "node-html-parser": "^6.1.13",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
+}
