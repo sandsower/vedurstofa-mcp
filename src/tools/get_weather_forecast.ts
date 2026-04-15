@@ -14,7 +14,7 @@ import {
   type StationForecast,
 } from "../sources/forecast.js";
 import { getTextForecast } from "../sources/text_forecast.js";
-import { resolveOrDefault } from "../stations.js";
+import { loadStations, resolveOrDefault } from "../stations.js";
 import { ScraperDriftError, UpstreamError } from "../errors.js";
 import { log } from "../logger.js";
 import type { ToolDescriptor } from "./types.js";
@@ -73,8 +73,9 @@ export const getWeatherForecastTool: ToolDescriptor<typeof inputSchema> = {
     additionalProperties: false,
   },
   schema: inputSchema,
-  async handler(input, ctx) {
-    const { resolved, failures } = resolveOrDefault(input.stations, ctx.stations);
+  async handler(input) {
+    const stations = await loadStations();
+    const { resolved, failures } = resolveOrDefault(input.stations, stations);
     const errors: Array<{ subject: string; reason: string }> = failures.map((f) => ({
       subject: `input:${f.input}`,
       reason: f.reason,

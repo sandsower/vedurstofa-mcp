@@ -8,7 +8,7 @@ import { z } from "zod";
 
 import { buildEnvelope, serializeEnvelope } from "../response.js";
 import { getObservationIndex } from "../sources/observations.js";
-import { resolveOrDefault, suggestStations } from "../stations.js";
+import { loadStations, resolveOrDefault, suggestStations } from "../stations.js";
 import type { ToolDescriptor } from "./types.js";
 
 const inputSchema = z
@@ -50,8 +50,9 @@ export const getWeatherNowTool: ToolDescriptor<typeof inputSchema> = {
     additionalProperties: false,
   },
   schema: inputSchema,
-  async handler(input, ctx) {
-    const { resolved, failures } = resolveOrDefault(input.stations, ctx.stations);
+  async handler(input) {
+    const stations = await loadStations();
+    const { resolved, failures } = resolveOrDefault(input.stations, stations);
 
     const errors: Array<{ subject: string; reason: string }> = failures.map((f) => ({
       subject: `input:${f.input}`,
@@ -69,7 +70,7 @@ export const getWeatherNowTool: ToolDescriptor<typeof inputSchema> = {
       for (const { station } of resolved) {
         const obs = bulk.index.get(station.id);
         if (!obs) {
-          const suggestions = suggestStations(station.name, ctx.stations, 3);
+          const suggestions = suggestStations(station.name, stations, 3);
           errors.push({
             subject: `station:${station.id}`,
             reason:

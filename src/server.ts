@@ -12,16 +12,16 @@ import {
 
 import { PACKAGE_VERSION } from "./config.js";
 import { log } from "./logger.js";
-import { loadStations } from "./stations.js";
 import { tools } from "./tools/registry.js";
 import type { ToolContext } from "./tools/types.js";
 import { ValidationError } from "./errors.js";
 
 export async function startServer(): Promise<void> {
-  // Preload station catalog before accepting requests so name resolution
-  // works on the very first tool call.
-  const stations = await loadStations();
-  const ctx: ToolContext = { stations };
+  // Station catalog is loaded on demand inside each tool handler — the
+  // cache dedupes concurrent callers and keeps the catalog forever once
+  // loaded. Eager preload here would block the initialize handshake on a
+  // cold upstream.
+  const ctx: ToolContext = {};
 
   const server = new Server(
     {
@@ -85,7 +85,6 @@ export async function startServer(): Promise<void> {
   await server.connect(transport);
   log.debug("vedurstofa-mcp ready", {
     version: PACKAGE_VERSION,
-    stationCount: stations.length,
     tools: tools.map((t) => t.name),
   });
 }

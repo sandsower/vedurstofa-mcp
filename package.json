@@ -1,17 +1,31 @@
 {
   "name": "vedurstofa-mcp",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "mcpName": "io.github.sandsower/vedurstofa-mcp",
   "description": "MCP server for Icelandic weather, earthquakes, and hazard data from the Icelandic Meteorological Office (Veðurstofan).",
   "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "claude",
+    "anthropic",
     "iceland",
     "weather",
+    "forecast",
     "earthquakes",
     "vedurstofa",
-    "mcp",
     "imo"
   ],
   "license": "MIT",
   "author": "Vic Valenzuela",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sandsower/vedurstofa-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sandsower/vedurstofa-mcp/issues"
+  },
+  "homepage": "https://github.com/sandsower/vedurstofa-mcp#readme",
   "type": "module",
   "main": "dist/index.js",
   "bin": {

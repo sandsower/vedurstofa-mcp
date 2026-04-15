@@ -3,9 +3,11 @@
  * See decision ledger for rationale.
  */
 
-export const PACKAGE_VERSION = "0.1.0";
+import pkg from "../package.json" with { type: "json" };
 
-export const USER_AGENT = `vedurstofa-mcp/${PACKAGE_VERSION} (https://github.com/vic/vedurstofa-mcp)`;
+export const PACKAGE_VERSION: string = pkg.version;
+
+export const USER_AGENT = `vedurstofa-mcp/${PACKAGE_VERSION} (+https://github.com/sandsower/vedurstofa-mcp)`;
 
 /** Upstream timeout per request. No retries. */
 export const UPSTREAM_TIMEOUT_MS = 5_000;

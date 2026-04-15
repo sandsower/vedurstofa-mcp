@@ -8,7 +8,7 @@ import { z } from "zod";
 
 import { API_VEDUR_BASE } from "../config.js";
 import { buildEnvelope, serializeEnvelope } from "../response.js";
-import { normalizeName } from "../stations.js";
+import { loadStations, normalizeName } from "../stations.js";
 import type { ToolDescriptor } from "./types.js";
 
 const inputSchema = z
@@ -51,9 +51,10 @@ export const listWeatherStationsTool: ToolDescriptor<typeof inputSchema> = {
     additionalProperties: false,
   },
   schema: inputSchema,
-  async handler(input, ctx) {
+  async handler(input) {
     const { region, limit } = input;
-    let results = ctx.stations;
+    const stations = await loadStations();
+    let results = stations;
 
     if (region) {
       const needle = normalizeName(region);
@@ -71,7 +72,7 @@ export const listWeatherStationsTool: ToolDescriptor<typeof inputSchema> = {
       source: `${API_VEDUR_BASE}/weather/stations`,
       data: {
         count: results.length,
-        total_in_catalog: ctx.stations.length,
+        total_in_catalog: stations.length,
         stations: results.map((s) => ({
           id: s.id,
           name: s.name,
