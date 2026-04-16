@@ -2,6 +2,9 @@
  * Entry point. tsup injects the `#!/usr/bin/env node` shebang at build time.
  */
 
+// Must be first — patches TLS before any fetch() calls.
+import "./tls-patch.js";
+
 import { startServer } from "./server.js";
 import { log } from "./logger.js";
 

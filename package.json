@@ -1,6 +1,6 @@
 {
   "name": "vedurstofa-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "mcpName": "io.github.sandsower/vedurstofa-mcp",
   "description": "MCP server for Icelandic weather, earthquakes, and hazard data from the Icelandic Meteorological Office (Veðurstofan).",
   "keywords": [
@@ -33,6 +33,7 @@
   },
   "files": [
     "dist",
+    "certs",
     "README.md",
     "LICENSE"
   ],
